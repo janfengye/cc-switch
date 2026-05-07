@@ -1,5 +1,5 @@
 use indexmap::IndexMap;
-use tauri::State;
+use tauri::{Emitter, State};
 
 use crate::app_config::AppType;
 use crate::commands::copilot::CopilotAuthState;
@@ -14,6 +14,7 @@ use std::str::FromStr;
 // 常量定义
 const TEMPLATE_TYPE_GITHUB_COPILOT: &str = "github_copilot";
 const TEMPLATE_TYPE_TOKEN_PLAN: &str = "token_plan";
+const TEMPLATE_TYPE_BALANCE: &str = "balance";
 const COPILOT_UNIT_PREMIUM: &str = "requests";
 
 /// 获取所有供应商
@@ -152,19 +153,55 @@ pub fn import_default_config(state: State<'_, AppState>, app: String) -> Result<
 #[allow(non_snake_case)]
 #[tauri::command]
 pub async fn queryProviderUsage(
+    app_handle: tauri::AppHandle,
     state: State<'_, AppState>,
     copilot_state: State<'_, CopilotAuthState>,
     #[allow(non_snake_case)] providerId: String, // 使用 camelCase 匹配前端
     app: String,
 ) -> Result<crate::provider::UsageResult, String> {
     let app_type = AppType::from_str(&app).map_err(|e| e.to_string())?;
+    // inner 可能以两种形式失败：
+    //   1) 返回 Ok(UsageResult { success: false, .. }) —— 业务失败（401、脚本报错等）
+    //   2) 返回 Err(String) —— RPC/DB/Copilot fetch_usage 等 transport 层失败
+    // 两种都要把"失败"写进 UsageCache 并刷新托盘，让 format_script_summary 的
+    // success 守卫生效、suffix 自然消失，避免旧 success 快照长期滞留。
+    // 同时保持原始 Err 返回给前端 React Query 的 onError 回调，不吞错误。
+    let inner =
+        query_provider_usage_inner(&state, &copilot_state, app_type.clone(), &providerId).await;
+    let snapshot = match &inner {
+        Ok(r) => r.clone(),
+        Err(err_msg) => crate::provider::UsageResult {
+            success: false,
+            data: None,
+            error: Some(err_msg.clone()),
+        },
+    };
+    let payload = serde_json::json!({
+        "kind": "script",
+        "appType": app_type.as_str(),
+        "providerId": &providerId,
+        "data": &snapshot,
+    });
+    if let Err(e) = app_handle.emit("usage-cache-updated", payload) {
+        log::error!("emit usage-cache-updated (script) 失败: {e}");
+    }
+    state.usage_cache.put_script(app_type, providerId, snapshot);
+    crate::tray::schedule_tray_refresh(&app_handle);
+    inner
+}
 
+async fn query_provider_usage_inner(
+    state: &AppState,
+    copilot_state: &CopilotAuthState,
+    app_type: AppType,
+    provider_id: &str,
+) -> Result<crate::provider::UsageResult, String> {
     // 从数据库读取供应商信息，检查特殊模板类型
     let providers = state
         .db
         .get_all_providers(app_type.as_str())
         .map_err(|e| format!("Failed to get providers: {e}"))?;
-    let provider = providers.get(&providerId);
+    let provider = providers.get(provider_id);
     let usage_script = provider
         .and_then(|p| p.meta.as_ref())
         .and_then(|m| m.usage_script.as_ref());
@@ -268,8 +305,32 @@ pub async fn queryProviderUsage(
         });
     }
 
+    // ── 官方余额查询路径 ──
+    if template_type == TEMPLATE_TYPE_BALANCE {
+        let settings_config = provider
+            .map(|p| &p.settings_config)
+            .cloned()
+            .unwrap_or_default();
+        let env = settings_config.get("env");
+        let base_url = env
+            .and_then(|e| e.get("ANTHROPIC_BASE_URL"))
+            .and_then(|v| v.as_str())
+            .unwrap_or("");
+        let api_key = env
+            .and_then(|e| {
+                e.get("ANTHROPIC_AUTH_TOKEN")
+                    .or_else(|| e.get("ANTHROPIC_API_KEY"))
+            })
+            .and_then(|v| v.as_str())
+            .unwrap_or("");
+
+        return crate::services::balance::get_balance(base_url, api_key)
+            .await
+            .map_err(|e| format!("Failed to query balance: {e}"));
+    }
+
     // ── 通用 JS 脚本路径 ──
-    ProviderService::query_usage(state.inner(), app_type, &providerId)
+    ProviderService::query_usage(state, app_type, provider_id)
         .await
         .map_err(|e| e.to_string())
 }
@@ -381,7 +442,7 @@ pub fn update_providers_sort_order(
 
 use crate::provider::UniversalProvider;
 use std::collections::HashMap;
-use tauri::{AppHandle, Emitter};
+use tauri::AppHandle;
 
 #[derive(Clone, serde::Serialize)]
 pub struct UniversalProviderSyncedEvent {
