@@ -91,7 +91,7 @@ Claude Code / Codex / Gemini 公式チャンネルが最安で元価格の 38% /
 
 <tr>
 <td width="180"><a href="https://www.right.codes/register?aff=CCSWITCH"><img src="assets/partners/logos/rightcode.jpg" alt="RightCode" width="150"></a></td>
-<td>本プロジェクトへのご支援として、Right Code にご協賛いただき誠にありがとうございます。Right Code は、Claude Code、Codex、Gemini などのモデルに対応した中継（プロキシ）サービスを安定して出しています。特に高いコストパフォーマンスを誇る Codex の月刊プランを主力としており、<strong>未使用分の利用枠を翌日に繰り越して利用できる（繰越対応）</strong>점이特长です。チャージ（入金）後に請求書の発行が可能で、企業・チーム向けには専任担当による個別対応も行っています。さらに CC Switch ユーザー向けの特別優待として、<a href="https://www.right.codes/register?aff=CCSWITCH">こちらのリンク</a>からご登録くと、チャージのたびに実支払額の 25% 相当の従量課金クレジットが付与されます。</td>
+<td>本プロジェクトへのご支援として、Right Code にご協賛いただき誠にありがとうございます。Right Code は、Claude Code、Codex、Gemini などのモデル向け中継サービスを安定して提供しており、従量課金と月額プランの 2 つの料金体系から選択できます。チャージ後に請求書の発行が可能で、法人・チームのお客様には専任担当による個別対応も行っています。さらに、CC Switch ユーザー向けの特別優待として、<a href="https://www.right.codes/register?aff=CCSWITCH">こちらのリンク</a>から登録すると、チャージのたびに実際の支払額の 5% 相当の従量課金クレジットが付与されます。</td>
 </tr>
 
 <tr>
@@ -100,8 +100,8 @@ Claude Code / Codex / Gemini 公式チャンネルが最安で元価格の 38% /
 </tr>
 
 <tr>
-<td width="180"><a href="https://www.openclaudecode.cn/register?aff=aOYQ"><img src="assets/partners/logos/mikubanner.svg" alt="Micu" width="150"></a></td>
-<td>Micu API のご支援に感謝します！Micu API は、最高のコストパフォーマンスと高い安定性を追求するグローバル大規模言語モデル中継サービスプロバイダーです。法人企業がバックアップしており、サービス停止のリスクを排除、迅速な正規請求書発行に対応！「試行コストゼロ」をモットーに、最低 1 元からチャージ可能で手数料無料、いつでも返金可能！CC Switch ユーザー向けの限定特典：<a href="https://www.openclaudecode.cn/register?aff=aOYQ">こちらのリンク</a>から登録し、チャージ時にプロモコード「ccswitch」を入力すると <strong>10% 割引</strong> が適用されます！</td>
+<td width="180"><a href="https://www.micuapi.ai/register?aff=aOYQ"><img src="assets/partners/logos/mikubanner.svg" alt="Micu" width="150"></a></td>
+<td>Micu API のご支援に感謝します！Micu API は、最高のコストパフォーマンスと高い安定性を追求するグローバル大規模言語モデル中継サービスプロバイダーです。法人企業がバックアップしており、サービス停止のリスクを排除、迅速な正規請求書発行に対応！「試行コストゼロ」をモットーに、最低 1 元からチャージ可能で手数料無料、いつでも返金可能！CC Switch ユーザー向けの限定特典：<a href="https://www.micuapi.ai/register?aff=aOYQ">こちらのリンク</a>から登録し、チャージ時にプロモコード「ccswitch」を入力すると <strong>10% 割引</strong> が適用されます！</td>
 </tr>
 <tr>
 <td width="180"><a href="https://lemondata.cc/r/FFX1ZDUP"><img src="assets/partners/logos/lemondata.png" alt="LemonData" width="150"></a></td>
