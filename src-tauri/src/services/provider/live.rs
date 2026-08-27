@@ -714,6 +714,33 @@ pub(crate) fn write_live_with_common_config_for_state(
     )
 }
 
+/// Validate the target provider's Codex live projection without writing:
+/// build the effective settings exactly like the live write would, then run
+/// the write-layer plan (legacy normalization, safety gates, token
+/// injection, TOML parsing). Called before `current` is committed — a
+/// write-layer refusal after `current` moved would let the next switch
+/// backfill the old live config into the new provider's DB row.
+pub(crate) fn preflight_codex_live_write_for_state(
+    state: &AppState,
+    provider: &Provider,
+) -> Result<(), AppError> {
+    let effective = build_effective_provider_for_live_with_codex_oauth_manager(
+        state.db.as_ref(),
+        &AppType::Codex,
+        provider,
+        &state.codex_oauth_manager,
+    )?;
+    let obj = effective
+        .settings_config
+        .as_object()
+        .ok_or_else(|| AppError::Config("Codex 供应商配置必须是 JSON 对象".to_string()))?;
+    let auth = obj
+        .get("auth")
+        .ok_or_else(|| AppError::Config("Codex 供应商配置缺少 'auth' 字段".to_string()))?;
+    let config_str = obj.get("config").and_then(|v| v.as_str());
+    crate::codex_config::preflight_codex_live_write(effective.category.as_deref(), auth, config_str)
+}
+
 pub(crate) fn write_live_with_common_config_for_codex_oauth_manager(
     db: &Database,
     app_type: &AppType,
@@ -2801,13 +2828,14 @@ base_url = "https://a.example/v1"
     fn category_less_managed_codex_binding_with_null_config_uses_selected_account_token() {
         let temp = tempfile::tempdir().expect("tempdir");
         let manager = Arc::new(CodexOAuthManager::new(temp.path().to_path_buf()));
+        let id_token = crate::codex_config::test_codex_id_token("managed-user");
         tauri::async_runtime::block_on(async {
             manager
                 .add_test_account_with_workspace_and_access_token(
                     "local-managed",
                     "workspace-shared",
                     "managed-token",
-                    Some("managed-id-token"),
+                    Some(&id_token),
                 )
                 .await
                 .expect("seed managed account");
@@ -2859,7 +2887,7 @@ base_url = "https://a.example/v1"
         );
         assert_eq!(
             tokens.get("id_token").and_then(|v| v.as_str()),
-            Some("managed-id-token")
+            Some(id_token.as_str())
         );
         assert_eq!(
             tokens.get("refresh_token").and_then(|v| v.as_str()),
