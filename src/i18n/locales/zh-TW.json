@@ -119,7 +119,9 @@
     "officialModelsBundled": "官方模型列表暫未取得，暫用 Codex 內建列表，可能缺少帳號專屬模型",
     "officialModelsUnavailable": "聚合的模型暫不可用：讀取不到 Codex 模型列表",
     "routeOwnsCatalog": "聚合的模型不會出現在 Codex 中：路由供應商使用自己的模型目錄檔案（model_catalog_json）",
-    "configOwnsCatalog": "聚合的模型不會出現在 Codex 中：config.toml 的 model_catalog_json 指向了別的模型目錄檔案",
+    "adoptCatalog": "改用 CC Switch 的模型目錄",
+    "adoptCatalogDone": "已改用 CC Switch 的模型目錄，重新啟動 Codex 後生效",
+    "adoptCatalogFailed": "改用 CC Switch 的模型目錄失敗：{{error}}",
     "noRoutingSupport": "不支援路由",
     "blockedByProxyHint": "路由模式下無法切換至官方供應商",
     "editProvider": "編輯供應商",
@@ -2493,7 +2495,7 @@
       "title": "MCP 標題（唯一）",
       "titlePlaceholder": "my-mcp-server",
       "name": "顯示名稱",
-      "namePlaceholder": "例如 @modelcontextprotocol/server-time",
+      "namePlaceholder": "例如 mcp-server-time",
       "enabledApps": "啟用至應用程式",
       "noAppsWarning": "至少選擇一個應用程式",
       "description": "描述",
@@ -2583,7 +2585,7 @@
         "description": "通用 HTTP 請求工具，支援 GET/POST 等 HTTP 方法，適合快速請求 API / 抓取網頁資料"
       },
       "time": {
-        "name": "@modelcontextprotocol/server-time",
+        "name": "mcp-server-time",
         "description": "時間查詢工具，提供目前時間、時區轉換、日期計算等功能"
       },
       "memory": {
@@ -4183,7 +4185,7 @@
     "noun": "MCP",
     "listSeparator": "、",
     "helpTitle": "MCP 怎麼同步",
-    "help": "以這裡為準：寫進你勾選的應用的設定檔，切換供應商時按這裡重寫。Claude Desktop、OpenClaw、Pi 不支援，所以表格裡沒有這三欄。",
+    "help": "以這裡為準：寫進你勾選的應用的設定檔，切換供應商時按這裡重寫。Claude Desktop、OpenClaw 不支援，所以表格裡沒有這兩欄；Pi 需要 1.0 以上，且不支援 SSE。",
     "importFromApps": "從應用匯入",
     "add": "新增 MCP",
     "moreActions": "MCP 的更多操作",
@@ -4512,6 +4514,20 @@
     "body": "CC Switch 這一版重新設計了介面，常用功能的位置有變化：\n• 模式移到了每個應用頁的頂部\n• 用量統計和授權中心移到了左側邊欄\n想了解全部變化，可以看看這一版的更新說明。",
     "viewReleaseNotes": "查看更新說明",
     "confirm": "我知道了"
+  },
+  "whatsNew": {
+    "updatedTo": "已更新至 v{{version}}",
+    "recentTitle": "近期更新",
+    "since": "自 v{{version}} 以來的更新",
+    "types": {
+      "new": "新增",
+      "fix": "修復",
+      "improve": "改進"
+    },
+    "versionDetails": "詳情",
+    "showEarlier": "還有 {{count}} 個更早的版本",
+    "viewFull": "查看完整更新內容",
+    "confirm": "知道了"
   },
   "authCenter": {
     "helpTitle": "授權中心是什麼",

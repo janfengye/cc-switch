@@ -119,7 +119,9 @@
     "officialModelsBundled": "官方模型列表暂未取到，暂用 Codex 内置列表，可能缺少账号专属模型",
     "officialModelsUnavailable": "聚合的模型暂不可用：读取不到 Codex 模型列表",
     "routeOwnsCatalog": "聚合的模型不会出现在 Codex 里：路由供应商使用自己的模型目录文件（model_catalog_json）",
-    "configOwnsCatalog": "聚合的模型不会出现在 Codex 里：config.toml 的 model_catalog_json 指向了别的模型目录文件",
+    "adoptCatalog": "改用 CC Switch 的模型目录",
+    "adoptCatalogDone": "已改用 CC Switch 的模型目录，重启 Codex 后生效",
+    "adoptCatalogFailed": "改用 CC Switch 的模型目录失败：{{error}}",
     "noRoutingSupport": "不支持路由",
     "blockedByProxyHint": "路由模式下不能切换到官方供应商",
     "editProvider": "编辑供应商",
@@ -2492,7 +2494,7 @@
       "title": "MCP 标题（唯一）",
       "titlePlaceholder": "my-mcp-server",
       "name": "显示名称",
-      "namePlaceholder": "例如 @modelcontextprotocol/server-time",
+      "namePlaceholder": "例如 mcp-server-time",
       "enabledApps": "启用到应用",
       "noAppsWarning": "至少选择一个应用",
       "description": "描述",
@@ -2582,7 +2584,7 @@
         "description": "通用 HTTP 请求工具，支持 GET/POST 等 HTTP 方法，适合快速请求接口/抓取网页数据"
       },
       "time": {
-        "name": "@modelcontextprotocol/server-time",
+        "name": "mcp-server-time",
         "description": "时间查询工具，提供当前时间、时区转换、日期计算等功能"
       },
       "memory": {
@@ -4182,7 +4184,7 @@
     "noun": "MCP",
     "listSeparator": "、",
     "helpTitle": "MCP 怎么同步",
-    "help": "以这里为准：写进你勾选的应用的配置文件，切换供应商时按这里重写。Claude Desktop、OpenClaw、Pi 不支持，所以表格里没有这三列。",
+    "help": "以这里为准：写进你勾选的应用的配置文件，切换供应商时按这里重写。Claude Desktop、OpenClaw 不支持，所以表格里没有这两列；Pi 需要 1.0 及以上，且不支持 SSE。",
     "importFromApps": "从应用导入",
     "add": "添加 MCP",
     "moreActions": "MCP 的更多操作",
@@ -4511,6 +4513,20 @@
     "body": "CC Switch 这一版重新设计了界面，常用功能的位置有变化：\n• 模式移到了每个应用页的顶部\n• 用量统计和授权中心移到了左侧边栏\n想了解全部变化，可以看看这一版的更新说明。",
     "viewReleaseNotes": "查看更新说明",
     "confirm": "我知道了"
+  },
+  "whatsNew": {
+    "updatedTo": "已更新到 v{{version}}",
+    "recentTitle": "近期更新",
+    "since": "自 v{{version}} 以来的更新",
+    "types": {
+      "new": "新增",
+      "fix": "修复",
+      "improve": "改进"
+    },
+    "versionDetails": "详情",
+    "showEarlier": "还有 {{count}} 个更早的版本",
+    "viewFull": "查看完整更新内容",
+    "confirm": "知道了"
   },
   "authCenter": {
     "helpTitle": "授权中心是什么",
