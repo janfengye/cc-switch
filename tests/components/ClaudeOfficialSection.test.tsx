@@ -200,6 +200,23 @@ describe("ClaudeOfficialSection", () => {
     ).toEqual(["ok:org"]);
   });
 
+  it("shows each account's plan in the auth center", () => {
+    const auth = baseAuth();
+    auth.accounts = [
+      {
+        ...account("max:org", "max@example.com"),
+        plan: "max",
+        rate_limit_tier: "default_claude_max_20x",
+      },
+      account("unknown:org", "unknown@example.com"),
+    ];
+    mocks.useManagedAuth.mockReturnValue(auth);
+    renderSection();
+
+    expect(screen.getByText(/Max 20x/)).toBeInTheDocument();
+    expect(screen.queryByText(/^Pro$|^Max$/)).not.toBeInTheDocument();
+  });
+
   it("lets the user paste the code when the browser can't come back", async () => {
     const auth = baseAuth();
     Object.assign(auth, {
@@ -245,6 +262,45 @@ describe("ClaudeOfficialSection", () => {
     ).toBeInTheDocument();
   });
 
+  it("lays out the sign-in choices like the Codex card", async () => {
+    // jsdom 没有 scrollIntoView，下拉打开时会调
+    Element.prototype.scrollIntoView = vi.fn();
+    const user = userEvent.setup();
+    mocks.useManagedAuth.mockReturnValue(baseAuth());
+    mocks.getStatus.mockResolvedValue({
+      accounts: [account("work:org", "work@example.com")],
+    });
+    const onChange = vi.fn();
+    const onManageAccounts = vi.fn();
+    withQuery(
+      <ClaudeAccountSelect
+        value={null}
+        onChange={onChange}
+        onManageAccounts={onManageAccounts}
+      />,
+    );
+
+    const select = screen.getByRole("combobox", { name: "登录方式" });
+    expect(select).toHaveTextContent("跟随 Claude Code 登录");
+    await user.click(select);
+    expect(
+      (await screen.findAllByRole("option")).map((el) => el.textContent),
+    ).toEqual([
+      "work@example.com",
+      "添加或管理 Claude 账号",
+      "跟随 Claude Code 登录账号会随 Claude Code 当前登录变化",
+    ]);
+    await user.click(screen.getByRole("option", { name: /添加或管理/ }));
+    expect(onManageAccounts).toHaveBeenCalled();
+    expect(onChange).not.toHaveBeenCalled();
+
+    await user.click(select);
+    await user.click(
+      await screen.findByRole("option", { name: "work@example.com" }),
+    );
+    expect(onChange).toHaveBeenCalledWith("work:org");
+  });
+
   it("points to Open Terminal when a config dir override blocks switching", async () => {
     mocks.getLoginSwitch.mockResolvedValue(
       loginSwitch({ blocked: "overrideDir" }),
@@ -269,6 +325,7 @@ describe("ClaudeOfficialSection", () => {
           login_expires_at: Date.now() - day,
         },
         account("named:org", "named@example.com"),
+        { ...account("pro:org", "pro@example.com"), plan: "pro" },
       ],
     });
     withQuery(
@@ -285,6 +342,16 @@ describe("ClaudeOfficialSection", () => {
           note="团队号"
         />
         <ClaudeBoundAccountLine accountId="gone:org" providerName="Gone" />
+        <ClaudeBoundAccountLine
+          accountId="pro:org"
+          providerName="Pro card"
+          showPlan
+        />
+        <ClaudeBoundAccountLine
+          accountId="pro:org"
+          providerName="Usage off"
+          note="额度关了"
+        />
       </>,
     );
     // 不带「账号：」前缀
@@ -300,5 +367,11 @@ describe("ClaudeOfficialSection", () => {
     // 备注优先
     expect(screen.getByText("团队号")).toBeInTheDocument();
     expect(screen.getByText(/不在这台电脑上的账号/)).toBeInTheDocument();
+    // 套餐跟在账号后面；读不到套餐的号不写
+    expect(screen.getByText("pro@example.com")).toBeInTheDocument();
+    expect(screen.getAllByText(/· /)).toHaveLength(1);
+    // 额度查询关着的卡不写套餐
+    expect(screen.getAllByText("· Pro")).toHaveLength(1);
+    expect(screen.getByText("额度关了")).toBeInTheDocument();
   });
 });

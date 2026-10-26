@@ -60,7 +60,6 @@ const BUTTON_ICON: Record<string, LucideIcon> = {
   add: Plus,
   remove: Minus,
   enable: Power,
-  use: Power,
   disable: PowerOff,
   openTerminal: SquareTerminal,
 };
@@ -75,6 +74,8 @@ interface ProviderCardActionsProps {
   isTesting?: boolean;
   onConfigureUsage?: () => void;
   onOpenTerminal?: () => void;
+  /** 这张卡打开的终端是否与 CC Switch 的切换隔离（见 terminalIsIsolated），决定提示里带不带「环境隔离」 */
+  openTerminalIsolated?: boolean;
 }
 
 /**
@@ -93,13 +94,16 @@ export function ProviderCardActions({
   isTesting,
   onConfigureUsage,
   onOpenTerminal,
+  openTerminalIsolated,
 }: ProviderCardActionsProps) {
   const { t } = useTranslation();
   const { status, buttons, move, menuItems = [] } = presentation;
 
   return (
     <div className="flex shrink-0 items-center gap-2">
-      <div className="flex items-center justify-end gap-1">
+      {/* 主操作位定宽：图标按钮和「● 使用中」这类状态文字宽度不同，不定宽的话
+          切换后左边的用量会被推开、跟其他卡片对不齐。按最长的常见状态留宽，靠右对齐 */}
+      <div className="flex min-w-20 items-center justify-end gap-1">
         {status && (
           <span className="inline-flex items-center gap-1.5 whitespace-nowrap px-1 text-body font-medium text-fg-1">
             <span
@@ -150,7 +154,13 @@ export function ProviderCardActions({
       )}
 
       {onOpenTerminal && (
-        <HoverTip content={t("provider.openTerminal")}>
+        <HoverTip
+          content={t(
+            openTerminalIsolated
+              ? "provider.openTerminalIsolated"
+              : "provider.openTerminal",
+          )}
+        >
           <Button
             variant="quiet"
             size="icon-compact"
