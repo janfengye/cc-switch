@@ -23,6 +23,8 @@ import CopilotQuotaFooter from "@/components/CopilotQuotaFooter";
 import CodexOauthQuotaFooter from "@/components/CodexOauthQuotaFooter";
 import XaiOauthQuotaFooter from "@/components/XaiOauthQuotaFooter";
 import AgyAccountQuotaFooter from "@/components/AgyAccountQuotaFooter";
+import { ClaudeBoundAccountLine } from "@/components/providers/forms/ClaudeOfficialSection";
+import ClaudeAccountQuotaFooter from "@/components/ClaudeAccountQuotaFooter";
 import KimiAccountQuotaFooter from "@/components/KimiAccountQuotaFooter";
 import { PROVIDER_TYPES, TEMPLATE_TYPES } from "@/config/constants";
 import {
@@ -250,9 +252,17 @@ export function ProviderCard({
   }, [provider.notes, displayUrl, fallbackUrlText]);
 
   const isBoundCodexOfficial = codexOfficialIdentity === "managed_account";
-  const usageEnabled =
-    provider.meta?.usage_script?.enabled ?? isBoundCodexOfficial;
   const isOfficial = isOfficialProvider(provider, appId);
+  // Claude 官方卡绑了 Claude 官方账号：副标题写账号，额度按这个号查
+  const claudeBoundAccountId =
+    appId === "claude" && isOfficial
+      ? resolveManagedAccountId(provider.meta, "claude_official")?.trim() ||
+        null
+      : null;
+  // 绑了账号的官方卡（Codex / Claude）默认查额度，和 Kimi、agy 的账号卡一样
+  const usageEnabled =
+    provider.meta?.usage_script?.enabled ??
+    (isBoundCodexOfficial || Boolean(claudeBoundAccountId));
   const supportsOfficialSubscription =
     isOfficial &&
     ["claude", "codex", "gemini", "grokbuild", "agy"].includes(appId);
@@ -448,6 +458,12 @@ export function ProviderCard({
                 </span>
               )}
             </div>
+          ) : claudeBoundAccountId ? (
+            <ClaudeBoundAccountLine
+              accountId={claudeBoundAccountId}
+              providerName={provider.name}
+              note={manualNote}
+            />
           ) : agyModel ? (
             <div className="mt-0.5 flex min-w-0 items-center gap-1.5 text-caption text-fg-2">
               <span className="min-w-0 truncate" title={agyModel}>
@@ -509,6 +525,17 @@ export function ProviderCard({
                   inline={true}
                   isCurrent={isCurrent}
                 />
+              ) : claudeBoundAccountId ? (
+                usageEnabled ? (
+                  <ClaudeAccountQuotaFooter
+                    accountId={claudeBoundAccountId}
+                    inline={true}
+                    isCurrent={isCurrent}
+                    autoQueryInterval={
+                      provider.meta?.usage_script?.autoQueryInterval ?? 5
+                    }
+                  />
+                ) : null
               ) : isOfficial ? (
                 officialSubscriptionEnabled ? (
                   agyBoundAccountId ? (

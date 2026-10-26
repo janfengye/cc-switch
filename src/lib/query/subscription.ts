@@ -266,3 +266,34 @@ export function useKimiAccountQuota(
 
   return useQuotaKeepLastGood(query, accountId);
 }
+
+/**
+ * 绑了账号的 Claude 官方卡额度（按账号查）：在用的号读默认登录，没在用的读它自己的账号目录。
+ * 令牌过期时后端会在那个目录里跑一次 `claude -p /usage`（Claude Code 自己刷新），可能要几秒。
+ */
+export function useClaudeAccountQuota(
+  accountId: string,
+  options: UseCodexOauthQuotaOptions = {},
+) {
+  const {
+    enabled = true,
+    autoQuery = false,
+    autoQueryIntervalMinutes = 5,
+  } = options;
+  const refetchInterval =
+    autoQuery && autoQueryIntervalMinutes > 0
+      ? Math.max(autoQueryIntervalMinutes, 1) * 60 * 1000
+      : false;
+  const query = useQuery({
+    queryKey: ["claude_official", "quota", accountId],
+    queryFn: () => subscriptionApi.getClaudeAccountQuota(accountId),
+    enabled,
+    refetchInterval,
+    refetchIntervalInBackground: Boolean(refetchInterval),
+    refetchOnWindowFocus: Boolean(refetchInterval),
+    staleTime: REFETCH_INTERVAL,
+    retry: 1,
+  });
+
+  return useQuotaKeepLastGood(query, accountId);
+}
