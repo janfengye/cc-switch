@@ -378,6 +378,7 @@
     "openclawModelNotFound": "所选模型已不存在，请刷新后重试",
     "backfillWarning": "切换成功，但旧供应商配置回填失败，您手动修改的配置可能未保存",
     "codexAuthCleanupFailed": "切换成功，但未能删除 auth.json，官方登录凭据仍留在磁盘上；如需彻底移除请手动删除 Codex 配置目录中的 auth.json",
+    "omoVariantCleanupFailed": "切换成功，但未能删除另一个 OMO 变体（OMO / OMO Slim）的配置文件，OpenCode 可能同时加载两者；请在 OpenCode 配置目录中手动删除它",
     "windowControlFailed": "窗口控制失败：{{error}}",
     "officialBlockedByProxy": "本地路由模式下不能切换到官方供应商，使用路由访问官方 API 可能导致账号被封禁",
     "proxyOfficialWarning": "当前供应商 {{name}} 是官方供应商，建议切换到第三方供应商后再使用本地路由",
@@ -3509,6 +3510,7 @@
       "skillNotFound": "技能不存在：{{directory}}",
       "missingRepoInfo": "缺少仓库信息（owner 或 name）",
       "downloadTimeout": "下载仓库 {{owner}}/{{name}} 超时（{{timeout}}秒）",
+      "downloadStalled": "下载仓库 {{owner}}/{{name}} 时连续 {{timeout}} 秒没有收到数据，已中止",
       "skillDirNotFound": "技能目录不存在：{{path}}",
       "directoryConflict": "技能目录 '{{directory}}' 已被 {{existing_repo}} 占用，无法从 {{new_repo}} 安装",
       "emptyArchive": "下载的压缩包为空",
@@ -4333,6 +4335,7 @@
     "usage": "用量统计",
     "auth": "授权中心",
     "authNeedsReauth": "有账号需要重新登录",
+    "skills": "Skills",
     "prompts": "提示词",
     "sessions": "会话",
     "apps": "应用",
@@ -5403,5 +5406,11 @@
     "installFailed": "安装更新失败",
     "downloadingInline": "正在后台下载新版本…",
     "downloadedInline": "已下载完毕"
+  },
+  "unreadableEntry": {
+    "title": "「{{name}}」的数据无法读取",
+    "hint": "可能由更新版本的 CC Switch 写入。数据已原样保留，不能编辑或启用；升级后即可恢复，也可以删除。",
+    "confirmTitle": "删除无法读取的条目",
+    "confirmMessage": "删除「{{name}}」？只删除 CC Switch 里的这条记录，不改动各应用自己的配置文件。"
   }
 }
