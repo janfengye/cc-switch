@@ -442,7 +442,7 @@ fn expand_env_chars_with_lookup(
 /// 单探兜底 (`scan_cli_version`) 与全量枚举 (`enumerate_tool_installations`) 共用，
 /// 确保两条路径看到的是同一组安装位置。
 pub(super) fn build_tool_search_paths(tool: &str) -> Vec<std::path::PathBuf> {
-    let home = dirs::home_dir().unwrap_or_default();
+    let home = crate::config::get_home_dir();
 
     // 常见的安装路径（原生安装优先）
     // Preserve search priority without scanning all previous paths for every insertion.
@@ -1476,10 +1476,21 @@ pub(super) fn locate_default_tool(
 
     match candidates.as_slice() {
         [(only, _)] => Ok(only.clone()),
-        [] => Err(format!("{tool} is not installed")),
+        [] => desktop_bundled_tool(tool).ok_or_else(|| format!("{tool} is not installed")),
         _ => Err(format!(
             "{tool} is installed but its default installation is ambiguous"
         )),
+    }
+}
+
+/// 只装了 Codex 桌面版的人没有独立 CLI：运行时命令（插件页、守护进程重启）退到桌面版自带的
+/// 那个（#9850），与模型目录探测用的是同一份候选。只在这里兜底、不进安装枚举：应用页的检测、
+/// 升级、卸载仍只管独立安装的 CLI（#8468）。
+fn desktop_bundled_tool(tool: &str) -> Option<std::path::PathBuf> {
+    if tool == "codex" {
+        crate::codex_config::codex_desktop_cli()
+    } else {
+        None
     }
 }
 
@@ -1509,9 +1520,7 @@ fn mise_shim_target(
         .stdout(Stdio::piped())
         .stderr(Stdio::piped());
     // GUI 进程的工作目录是 `/`；在 home 下解析，与新开终端看到的 mise 配置一致。
-    if let Some(home) = dirs::home_dir() {
-        cmd.current_dir(home);
-    }
+    cmd.current_dir(crate::config::get_home_dir());
     isolate_child_process_group(&mut cmd);
     let out = wait_child_output(cmd.spawn().ok()?, deadline).ok()?;
     if !out.status.success() {
