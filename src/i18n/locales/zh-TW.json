@@ -235,7 +235,7 @@
         "account": "帳號",
         "accountFollow": "跟隨 agy 目前登入",
         "accountMissing": "不在這台電腦上的帳號",
-        "accountHelp": "選了帳號的話，「開啟終端機」前會先把 agy 的登入切換到它（全域生效，之後新開的 agy 都用它）。帳號在授權中心新增。"
+        "accountHelp": "儲存新的綁定帳號後，新開啟的 agy 會使用它。用這張卡片開啟終端機時也會切回綁定帳號。帳號可在授權中心新增。"
       },
       "gemini": {
         "model": "模型",
@@ -917,6 +917,14 @@
     "minimizeToTrayDescription": "勾選後點擊關閉按鈕會隱藏至系統匣，取消則直接退出應用程式。",
     "useAppWindowControls": "啟用應用程式等級視窗按鈕",
     "useAppWindowControlsDescription": "開啟後使用應用程式自建的最小化、最大化/還原、關閉按鈕；關閉後沿用系統視窗模式。",
+    "copilotVscode": {
+      "enable": "套用至 VS Code Copilot 外掛程式",
+      "description": "開啟後自動將 CLI 中已加入的模型和金鑰套用至偵測到的全部 VS Code 設定，後續供應商變更自動同步。",
+      "pending": "VS Code 連動待同步",
+      "pendingDescription": "VS Code 可能仍使用上次設定，可重試同步最新變更。",
+      "noTargets": "找不到 VS Code 設定，請先啟動一次 VS Code 後重試。",
+      "failed": "同步至 VS Code Copilot 失敗"
+    },
     "enableClaudePluginIntegration": "套用至 Claude Code 外掛程式",
     "enableClaudePluginIntegrationDescription": "開啟後 VS Code Claude Code 外掛程式的供應商將隨本軟體切換",
     "skipClaudeOnboarding": "跳過 Claude Code 初次安裝確認",
